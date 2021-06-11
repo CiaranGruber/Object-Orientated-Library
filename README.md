@@ -33,7 +33,7 @@ When creating a type, there are various functions and structures which should be
 * At least one constructor function added to a class that allows for input of parameters to create an instance
 In addition, it may be recommended to override the standard functions "compare", "to_string", and "string_len" which are a part of the Object class. 
 
-### General Notes
+# General Notes
 Direct changes to structures themselves are not necessary and therefore, all use of this program should be done using the functions that are provided by the program to prevent errors from occurring. Furthermore, all classes should be entered to the class handler to prevent issues regarding duplicate classes, etc.
 
-Note that project is not complete in its current state and will be unlikely to work as intended as it is at the moment
+Note that the project is not complete in its current state and will be unlikely to work as intended as it is at the moment
