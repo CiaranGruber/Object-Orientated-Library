@@ -14,7 +14,7 @@ The structures used to handle errors
 
 #include <stdlib.h>
 #include "../program-handler/program_handler.h"
-#include "../../types/type-error/t_Error.h"
+#include "../../types/Error/t_Error.h"
 
 /* A node in the Error Handler that contains an allowed error and a link to the next node */
 typedef struct err_hand_node err_hand_node_t;
@@ -26,9 +26,9 @@ struct err_hand_node {
 };
 
 /* A structure that holds the allowed errors contained in a Error Handler */
-typedef struct {
+struct gen_err_hand {
     err_hand_node_t *first; // A pointer to the first node in the Error Handler
-} err_hand_t;
+};
 
 /*
 Frees the memory occupuied by a Error Handler structure
@@ -38,28 +38,35 @@ Frees the memory occupuied by a Error Handler structure
 void free_err_hand(err_hand_t *src);
 
 /*
+Initialises an Error Handler by resetting the structure without freeing memory
+
+*src: The Error Handler to initialise
+*/
+void init_err_hand(err_hand_t *src);
+
+/*
 Adds a class to the Error Handler if the given error does not already exist
 
-*self: The program handler that contains the class and error handlers
+*prog_handler: The program handler that contains the class and error handlers
 *error: The error class to add to the Error Handler
 */
-void add_err(prog_hand_t *self, cls_error_t *error);
+inst_error_t *add_err(prog_hand_t *prog_handler, cls_error_t *error);
 
 /*
 Handles any existing errors by exiting the program if the errors have not been cauught as well as
 printing the related error messages
 
-*self: The program handler that contains the class and error handlers
+*prog_handler: The program handler that contains the class and error handlers
 *error_instance: The error class to add to the Error Handler
 */
-void handle_err(prog_hand_t *self, inst_error_t *error_instance);
+void handle_err(prog_hand_t *prog_handler, inst_error_t *error_instance);
 
 /*
 Deletes an error from the Error Handler based upon the class of error
 
-*self: The program handler that contains the class and error handlers
+*prog_handler: The program handler that contains the class and error handlers
 *error: The error class to delete from the Error Handler
 */
-void del_err(prog_hand_t *self, cls_error_t *error);
+inst_error_t *remove_err(prog_hand_t *prog_handler, cls_error_t *error);
 
 #endif

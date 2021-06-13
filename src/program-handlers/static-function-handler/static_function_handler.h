@@ -1,81 +1,82 @@
 /*
-Function Handler
+Static Function Handler
 By Ciaran Gruber
 
-The Function Handler is used to handle the use of various Function Sets within a class
+The Static Function Handler is used to handle the use of various Static Function Sets within a class
 
 File-specific:
-Function Handler - Header File
-The structures used to represent a Function Handler
+Static Function Handler - Header File
+The structures used to represent a Static Function Handler
 */
 
-#ifndef FUNCTION_HANDLER
-#define FUNCTION_HANDLER
+#ifndef STATIC_FUNCTION_HANDLER
+#define STATIC_FUNCTION_HANDLER
 
 #include "../program-handler/program_handler.h"
-#include "../../base-program/function/function_set.h"
+#include "../../base-program/static-function/static_function_set.h"
 
-/* A node in the Function Handler that contains a function set and a link to the next node */
-typedef struct funct_hand_node funct_hand_node_t;
+/* A node in the Static Function Handler that contains a function set and a link to the next node */
+typedef struct s_funct_hand_node s_funct_hand_node_t;
 
-/* A node in the Function Handler that contains a function set and a link to the next node */
-struct funct_hand_node {
-    function_set_t *function_set;    // The function set contained within the node
-    funct_hand_node_t *next;       // The next node in the Function Handler
+/* A node in the Static Function Handler that contains a function set and a link to the next node */
+struct s_funct_hand_node {
+    s_function_set_t *function_set;    // The function set contained within the node
+    s_funct_hand_node_t *next;       // The next node in the Static Function Handler
 };
 
-/* A structure that holds the function sets contained in a Function Handler */
-struct gen_funct_hand {
-    funct_hand_node_t *first;
+/* A structure that holds the function sets contained in a Static Function Handler */
+struct gen_s_funct_hand {
+    s_funct_hand_node_t *first;
 };
 
 /*
-Frees the memory occupuied by a Function Handler structure
+Frees the memory occupuied by a Static Function Handler structure
 
-*src: The Function Handler structure whose memory is to be freed
+*src: The Static Function Handler structure whose memory is to be freed
 */
-void free_funct_hand(funct_hand_t *src);
+void free_s_funct_hand(s_funct_hand_t *src);
 
 /*
-Creates a new Function Handler by resetting the source variable
+Creates a new Static Function Handler by resetting the source variable
 
 *prog_handler: The program handler that contains the class and error handlers
-*dest: The pointer to the Function Handler to initialise
+*dest: The pointer to the Static Function Handler to initialise
 
 Errors:
     ErrInvalidParameters: Thrown if 'dest' is set to NULL
 */
-inst_error_t *funct_hand_create(prog_hand_t *prog_handler, funct_hand_t *dest);
+inst_error_t *s_funct_hand_create(prog_hand_t *prog_handler, s_funct_hand_t *dest);
 
 /*
-Adds a function to the Function Handler
+Adds a function to the Static Function Handler
 
 *prog_handler: The program handler that contains the class and error handlers
-*self: The Function Handler that is to be modified
-*function: The function to add to the Function Handler
+*self: The Static Function Handler that is to be modified
+*function: The function to add to the Static Function Handler
 
 Errors:
     ErrInvalidParameters: Thrown if 'self' or 'function' is set to NULL
-    ErrOutOfMemory: Thrown if there is not enough memory to add a Function Set if required
+    ErrOutOfMemory: Thrown if there is not enough memory to add a Static Function Set if required
     ErrFunctionAlreadyExists: Thrown if the given function already exists in the Function Handler
 */
-inst_error_t *add_function(prog_hand_t *prog_handler, funct_hand_t *self, function_t *function);
+inst_error_t *add_s_function(prog_hand_t *prog_handler, s_funct_hand_t *self, s_function_t *function);
 
 /*
-Removes a function from the Function Handler
+Removes a function from the Static Function Handler
 
 *prog_handler: The program handler that contains the class and error handlers
-*self: The Function Handler to remove the function from
-*function: The function to remove from the Function Handler
+*self: The Static Function Handler to remove the function from
+*function: The function to remove from the Static Function Handler
 
 Errors:
     ErrInvalidParameters: Thrown if 'self' or 'function' is set to NULL
-    ErrFunctionNotDefined: Thrown if the given function can not be found within the Function Handler
+    ErrFunctionNotDefined: Thrown if the given function can not be found within the Static Function Handler
 */
-inst_error_t *remove_function(prog_hand_t *prog_handler, funct_hand_t *self, function_t *function);
+inst_error_t *remove_s_function(prog_hand_t *prog_handler, s_funct_hand_t *self,
+        s_function_t *function);
 
 /*
-Removes a function from the Function Handler by its name and parameters
+Removes a function from the Static Function Handler by its name and parameters
 
 *prog_handler: The program handler that contains the class and error handlers
 *self: The Function Handler to remove the function from
@@ -86,18 +87,17 @@ param_count: The number of parameters within the function that is to be removed
 
 Errors:
     ErrInvalidParameters: Thrown if 'self' or 'name' is set to NULL
-    ErrFunctionNotDefined: Thrown if the given function can not be found within the Function Handler
+    ErrFunctionNotDefined: Thrown if the given function can not be found within the Static Function Handler
 */
-inst_error_t *remove_function_by_name(prog_hand_t *prog_handler, funct_hand_t *self, char *name,
+inst_error_t *remove_s_function_by_name(prog_hand_t *prog_handler, s_funct_hand_t *self, char *name, 
         class_t *return_type, class_t **param_types, int param_count);
 
 /*
 Runs a function in the function handler with the specified name and parameters
 
 *prog_handler: The program handler that contains the class and error handlers
-*self: The Function Handler used to find and run the function
+*self: The Static Function Handler used to find and run the function
 *name: The name of the function that is to be run
-*inst_var: The instance that is passed through to the function
 *return_var: A pointer to the variable that is returned after running the function
 **params: The list of parameters that will be passed into the function
 param_count: The number of parameters that are passed into the function
@@ -108,8 +108,8 @@ Errors: Any errors that are produced from running the function as well as the fo
     ErrInvalidParameters: Thrown if 'self' or 'name' is set to NULL
     ErrFunctionNotDefined: Thrown when the function does not exist
 */
-inst_error_t *funct_hand_run(prog_hand_t *prog_handler, funct_hand_t *self, char *name, 
-        var_t *inst_var, var_t *return_var, var_t **params, int param_count);
+inst_error_t *s_funct_hand_run(prog_hand_t *prog_handler, s_funct_hand_t *self, char *name, 
+        var_t *return_var, var_t **params, int param_count);
 
 /*
 Gets the return type of a function within the handler that has the equivalent parameters
@@ -124,11 +124,11 @@ Errors:
     ErrInvalidParameters: Thrown if 'self' or 'return_type' is set to NULL
     ErrFunctionNotDefined: Thrown if a function matching the parameters was not found
 */
-inst_error_t *function_get_return(prog_hand_t *prog_handler, funct_hand_t *self, char *name,
+inst_error_t *s_function_get_return(prog_hand_t *prog_handler, s_funct_hand_t *self, char *name,
         class_t **return_type, class_t **param_types, int param_count);
 
 /*
-Returns whether the function exists in the Function Handler and if it does, returns a
+Returns whether the function exists in the Static Function Handler and if it does, returns a
 reference to the node before that function
 
 *prog_handler: The program handler that contains the class and error handlers
@@ -143,8 +143,8 @@ Returns: A boolean value stored in 'result' that shows whether the function was 
 Errors:
     ErrInvalidParameters: Thrown if 'result', 'self' or 'name' is set to NULL
 */
-inst_error_t *function_exists(prog_hand_t *prog_handler, bool *result, 
-        funct_hand_t *self, char *name, funct_hand_node_t **prev_node, class_t **param_types,
+inst_error_t *s_function_exists(prog_hand_t *prog_handler, bool *result, 
+        s_funct_hand_t *self, char *name, s_funct_hand_node_t **prev_node, class_t **param_types,
         int param_count);
 
 #endif

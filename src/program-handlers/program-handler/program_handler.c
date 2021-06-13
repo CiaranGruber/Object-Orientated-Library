@@ -13,7 +13,16 @@ The code used to provide for the implementation of a Program Handler
 #include "program_handler.h"
 
 void free_prog_hand(prog_hand_t *src) {
+    if (src == NULL) return;
+
     free_cls_hand(src->cls_handler);
     free_err_hand(src->err_handler);
     free(src);
+}
+
+void init_prog_hand(prog_hand_t *src) {
+    src->cls_handler = (cls_hand_t *)malloc(sizeof(cls_hand_t));
+    src->err_handler = (err_hand_t *)malloc(sizeof(err_hand_t));
+    init_cls_hand(src->cls_handler);
+    init_err_hand(src->err_handler);
 }

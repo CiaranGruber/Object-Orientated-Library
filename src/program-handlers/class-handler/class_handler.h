@@ -13,7 +13,7 @@ The structures used to handle classes within a program
 #define CLASS_HANDLER
 
 #include "../program-handler/program_handler.h"
-#include "../../base-program/generic-class/class.h"
+#include "../../base-program/class/class.h"
 
 /* A node in the Class Handler that contains a class and a link to the next node */
 typedef struct class_node class_node_t;
@@ -25,9 +25,9 @@ struct class_node {
 };
 
 /* A structure that holds the classes contained in a Class Handler */
-typedef struct {
+struct gen_class_hand {
     class_node_t *first; // The first class node in the Class Handler
-} cls_hand_t;
+};
 
 /*
 Frees the memory occupuied by a Class Handler structure
@@ -37,12 +37,20 @@ Frees the memory occupuied by a Class Handler structure
 void free_cls_hand(cls_hand_t *src);
 
 /*
+Initialises the Class Handler structure by resetting its values
+
+*src: The Class Handler to initialise
+*/
+void init_cls_hand(cls_hand_t *src);
+
+/*
 Adds a class to the Class Handler assuming that the given class does not already exist
 
 *prog_handler: The program handler that contains the class and error handlers
 *class: The class to add to the Class Handler
 
 Errors:
+    ErrInvalidParameters: Thrown if 'class' is set to NULL
     ErrClassAlreadyExists: Thrown if the class is already contained within the Class Handler
     ErrOutOfMemory: Thrown if the class can not be added due to a lack of memory
 */
@@ -56,7 +64,7 @@ Gets a class from the Class Handler based upon the class name
 *class_name: The name of the class to retrieve from the Class Handler
 
 Errors:
-    ErrInvalidParameters: Thrown if class_name or *dest is equal to NULL
+    ErrInvalidParameters: Thrown if 'dest' or 'class_name' is set to NULL
     ErrClassNotDefined: Thrown if the class_name does not exist in the Class Handler
 */
 inst_error_t *get_class(prog_hand_t *prog_handler, class_t **dest, char *class_name);
