@@ -3,14 +3,22 @@ Variable Test Code
 By Ciaran Gruber
 
 Used to test the generic variable data
+
+Todo: Restructure code format to present main section as a standalone package
+Todo: Add package handler in program handler in order to identify packages that are imported
+        - Create new error class for when packages are invalid
+Todo: Add functions to get class variables
+Todo: Allow for functions to be run with the "super" identifier used to get the parent function
+Todo: When freeing member fields, also free their data correctly if they use a variable handler
+Todo: Format return variables before running function
+
+When discussing, should I add a locked value to classes that occurs after a package is imported as
+it would protect from viruses, etc, or is this not needed?
 */
 
 #include <stdio.h>
-#include <stdlib.h>
 #include <string.h>
-#include "./program-handlers/program-handler/program_handler.h"
-#include "./types/Object/t_Object.h"
-#include "./types/Integer/t_Integer.h"
+#include "./lang-package/package-info/pkg_eu_lang.h"
 
 void test_object();
 
@@ -49,12 +57,7 @@ int main(int argc, char *argv[]) {
 }
 
 void test_object() {
-    prog_hand_t *program_handler = (prog_hand_t *)malloc(sizeof(prog_hand_t));
-    init_prog_hand(program_handler);
-    new_object_cls(program_handler);
-    new_integer_cls(program_handler);
-    // new_err_function_not_defined_cls(program_handler);
-    // Below is example of producing an error (will currently loop due to missing error classes)
-    new_integer_cls(program_handler);
-    init_integer_cls(program_handler);
+    prog_hand_t *program_handler;
+    program_handler = new_lang_package();
+    import_lang_package(program_handler);
 }
