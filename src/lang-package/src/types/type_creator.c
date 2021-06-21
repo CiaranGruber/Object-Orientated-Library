@@ -55,7 +55,7 @@ inst_error_t *new_class(prog_hand_t *prog_handler, char *class_name, char *paren
     }
 
     // Set integer data description
-    class->uses_inst_var_handler = managed_data;
+    class->has_managed_data = managed_data;
     if (managed_data) {
         class->size = sizeof(managed_data_t);
     } else {
@@ -85,7 +85,7 @@ inst_error_t *init_class(prog_hand_t *prog_handler, class_t *class) {
     if (error != NULL) return error;
 
     // Initialise Member Field Handler
-    if (class->uses_inst_var_handler) {
+    if (class->has_managed_data) {
         error = init_member_fields(prog_handler, class);
         if (error != NULL) return error;
     } else {
@@ -111,7 +111,8 @@ inst_error_t *remove_function(prog_hand_t *prog_handler, class_t *class, functio
         return new_error(prog_handler, "ErrInvalidParameters");
     }
 
-    error = fhand_remove_function(prog_handler, class->inst_methods, function);
+    error = fhand_remove_function(prog_handler, class->inst_methods, function->name, 
+                                    function->param_types, function->param_count);
     return error;
 }
 
@@ -122,7 +123,7 @@ inst_error_t *remove_function_by_name(prog_hand_t *prog_handler, class_t *class,
         return new_error(prog_handler, "ErrInvalidParameters");
     }
 
-    error = fhand_remove_function_by_name(prog_handler, class->inst_methods, name, param_types,
+    error = fhand_remove_function(prog_handler, class->inst_methods, name, param_types,
                                             param_count);
     return error;
 }
@@ -143,7 +144,8 @@ inst_error_t *remove_s_function(prog_hand_t *prog_handler, class_t *class, s_fun
         return new_error(prog_handler, "ErrInvalidParameters");
     }
 
-    error = sfhand_remove_function(prog_handler, class->static_methods, function);
+    error = sfhand_remove_function(prog_handler, class->static_methods, function->name,
+                                    function->param_types, function->param_count);
     return error;
 }
 
@@ -154,8 +156,8 @@ inst_error_t *remove_s_function_by_name(prog_hand_t *prog_handler, class_t *clas
         return new_error(prog_handler, "ErrInvalidParameters");
     }
 
-    error = sfhand_remove_function_by_name(prog_handler, class->static_methods, name, param_types,
-                                            param_count);
+    error = sfhand_remove_function(prog_handler, class->static_methods, name, param_types,
+                                        param_count);
     return error;
 }
 
@@ -229,7 +231,7 @@ static inst_error_t *init_inst_handler(prog_hand_t *prog_handler, class_t *class
     if (inst_methods == NULL) {
         return new_error(prog_handler, "ErrOutOfMemory");
     }
-    funct_hand_create(prog_handler, inst_methods);
+    new_fhand(prog_handler, inst_methods);
 
     // Set class methods
     class->inst_methods = inst_methods;
@@ -253,7 +255,7 @@ static inst_error_t *init_static_handler(prog_hand_t *prog_handler, class_t *cla
     if (static_methods == NULL) {
         return new_error(prog_handler, "ErrOutOfMemory");
     }
-    s_funct_hand_create(prog_handler, static_methods);
+    new_sfhand(prog_handler, static_methods);
     class->static_methods = static_methods;
 
     return NULL;

@@ -5,7 +5,7 @@ By Ciaran Gruber
 The Function Handler is used to handle the use of various Function Sets within a class
 
 File-specific:
-Error Handler - Code File
+Function Handler - Code File
 The code used to provide for the implementation of a Function Handler
 */
 
@@ -13,6 +13,12 @@ The code used to provide for the implementation of a Function Handler
 #include "function_handler.h"
 #include "../error-handler/error_handler.h"
 #include "../../base-program/function/function_set.h"
+
+static void __get_node(funct_hand_t *self, funct_hand_node_t **node, char *name);
+static void __get_next_node(funct_hand_t *self, funct_hand_node_t *prev, funct_hand_node_t **next,
+        bool funct_exists);
+static void __get_prev_node(funct_hand_t *self, bool *funct_exists, funct_hand_node_t **prev_node,
+        char *name);
 
 void free_funct_hand(funct_hand_t *src) {
     if (src == NULL) return;
@@ -27,7 +33,7 @@ void free_funct_hand(funct_hand_t *src) {
     free(src);
 }
 
-inst_error_t *funct_hand_create(prog_hand_t *prog_handler, funct_hand_t *dest) {
+inst_error_t *new_fhand(prog_hand_t *prog_handler, funct_hand_t *dest) {
     if (dest == NULL) {
         return new_error(prog_handler, "ErrInvalidParameters");
     }
@@ -40,28 +46,24 @@ inst_error_t *fhand_add_function(prog_hand_t *prog_handler, funct_hand_t *self, 
         return new_error(prog_handler, "ErrInvalidParameters");
     }
 
-    funct_hand_node_t *prev = NULL;
-    funct_hand_node_t *curr = self->first;
-    // Find function
-    while (curr != NULL) { // Break if function set doesn't exist
-        int comparison = strcmp(function->name, curr->function_set->name);
-        if (comparison < 0) { // Function set doesn't exist
-            break;
-        } else if (!comparison) { // Function set is the same
-            // Add function to function set
-            error = funct_set_add(prog_handler, curr->function_set, function);
-            return error;
-        }
-        prev = curr;
-        curr = curr->next;
+    // Get previous node
+    funct_hand_node_t *prev, *curr;
+    bool fset_exists;
+    __get_prev_node(self, &fset_exists, &prev, function->name);
+    // Add function to function set if it exists already
+    if (fset_exists) {
+        __get_next_node(self, prev, &curr, fset_exists);
+        error = fset_add_function(prog_handler, curr->function_set, function);
+        return error;
     }
+
     // Function set doesn't exist exist
-    funct_hand_node_t *new_node;
+    funct_hand_node_t *new_node = (funct_hand_node_t *)malloc(sizeof(funct_hand_node_t));
     // Create function set
     error = new_funct_set(prog_handler, new_node->function_set, function->name);
     if (error != NULL) return error;
     // Add function to function set
-    error = funct_set_add(prog_handler, new_node->function_set, function);
+    error = fset_add_function(prog_handler, new_node->function_set, function);
     if (error != NULL) return error;
 
     // Add function set and return no errors
@@ -71,40 +73,29 @@ inst_error_t *fhand_add_function(prog_hand_t *prog_handler, funct_hand_t *self, 
         self->first = new_node;
         return NULL;
     }
+    new_node->next = prev->next;
     prev->next = new_node;
-    new_node->next = curr;
     return NULL;
 }
 
-inst_error_t *fhand_remove_function(prog_hand_t *prog_handler, funct_hand_t *self, function_t *function) {
-    inst_error_t *error;
-    error = fhand_remove_function_by_name(prog_handler, self, function->name, function->param_types,
-                                    function->param_count);
-    return error;
-}
-
-inst_error_t *fhand_remove_function_by_name(prog_hand_t *prog_handler, funct_hand_t *self, char *name,
+inst_error_t *fhand_remove_function(prog_hand_t *prog_handler, funct_hand_t *self, char *name,
         class_t **param_types, int param_count) {
     inst_error_t *error;
     if (self == NULL || name == NULL) {
         return new_error(prog_handler, "ErrInvalidParameters");
     }
     
-    // Atempt to find function
+    // Get function node
     funct_hand_node_t *prev, *curr;
-    bool func_exists;
-    function_exists(prog_handler, &func_exists, self, name, &prev, param_types, param_count);
-    if (!func_exists) {
+    bool funct_exists;
+    __get_prev_node(self, &funct_exists, &prev, name);
+    __get_next_node(self, prev, &curr, funct_exists);
+    if (curr == NULL) {
         return new_error(prog_handler, "ErrFunctionNotDefined");
     }
-    if (prev == NULL) {
-        curr = self->first;
-    } else {
-        curr = prev->next;
-    }
     
-    // Remove function and return any errors
-    error = funct_set_remove(prog_handler, curr->function_set, param_types, param_count);
+    // Remove function and return any errors including ErrFunctionNotDefined
+    error = fset_remove(prog_handler, curr->function_set, param_types, param_count);
     if (error != NULL) return error;
 
     // Remove function set if that was the last function
@@ -120,78 +111,86 @@ inst_error_t *fhand_remove_function_by_name(prog_hand_t *prog_handler, funct_han
     return NULL;
 }
 
-inst_error_t *funct_hand_run(prog_hand_t *prog_handler, funct_hand_t *self, char *name, 
-        var_t *inst_var, var_t *return_var, var_t **params, int param_count) {
+inst_error_t *fhand_get_function(prog_hand_t *prog_handler, funct_hand_t *self, function_t **dest,
+        char *name, class_t **param_types, int param_count) {
     inst_error_t *error;
-    if (self == NULL || name == NULL) {
+    if (self == NULL || dest == NULL || name == NULL) {
         return new_error(prog_handler, "ErrInvalidParameters");
     }
 
-    // Attempt to find the function
-    funct_hand_node_t *curr = self->first;
-    while (curr != NULL) {
-        int comparison = strcmp(name, curr->function_set->name);
-        if (!comparison) {
-            break;
-        }
-        curr = curr->next;
-    }
+    // Get the function node
+    funct_hand_node_t *curr;
+    __get_node(self, &curr, name);
+    // Throw error if node could not be found
     if (curr == NULL) {
         return new_error(prog_handler, "ErrFunctionNotDefined");
     }
-
-    // Run the function and return any errors
-    error = function_set_run(prog_handler, curr->function_set, inst_var, return_var, params,
-                                param_count);
+    // Get function from function set
+    error = fset_get_function(prog_handler, curr->function_set, dest, param_types, param_count);
     return error;
 }
 
-inst_error_t *function_get_return(prog_hand_t *prog_handler, funct_hand_t *self, char *name,
-        class_t **return_type, class_t **param_types, int param_count) {
-    inst_error_t *error;
-    if (self == NULL || name == NULL) {
-        return new_error(prog_handler, "ErrInvalidParameters");
-    }
-
-    // Attempt to find the function
-    funct_hand_node_t *prev, *curr;
-    bool func_exists;
-    function_exists(prog_handler, &func_exists, self, name, &prev, param_types, param_count);
-    if (!func_exists) {
-        return new_error(prog_handler, "ErrFunctionNotDefined");
-    }
-    if (prev == NULL) {
-        curr = self->first;
-    } else {
-        curr = prev->next;
-    }
-
-    // Get the function type of the function
-    error = funct_set_get_return(prog_handler, curr->function_set, return_type, param_types,
-                                    param_count);
-    return error;
-}
-
-inst_error_t *function_exists(prog_hand_t *prog_handler, bool *result, 
-        funct_hand_t *self, char *name, funct_hand_node_t **prev_node, class_t **param_types,
-        int param_count) {
+inst_error_t *fhand_function_exists(prog_hand_t *prog_handler, bool *result, funct_hand_t *self,
+        char *name, class_t **param_types, int param_count) {
     inst_error_t *error;
     if (result == NULL || self == NULL || name == NULL) {
         return new_error(prog_handler, "ErrInvalidParameters");
     }
 
-    // Find node
+    // Get the current node
+    funct_hand_node_t *curr;
+    __get_node(self, &curr, name);
+    if (curr == NULL) {
+        *result = false;
+        return NULL;
+    }
+    // Check function set
+    *result = fset_function_exists(prog_handler, curr->function_set, result, param_types, param_count);
+    return NULL;
+}
+
+static void __get_prev_node(funct_hand_t *self, bool *fset_exists, funct_hand_node_t **prev_node,
+        char *name) {
     funct_hand_node_t *curr = self->first;
     *prev_node = NULL;
+
+    // Loop through nodes
     while (curr != NULL) {
+        // Check name of node
         int comparison = strcmp(name, curr->function_set->name);
-        if (!comparison) {
-            *result = true;
-            return NULL;
+        if (!comparison) { // Function was found
+            *fset_exists = true;
+            return;
+        } else if (comparison < 0) { // Function is not in rest of set by alphabetic rules
+            *fset_exists = false;
+            return;
         }
+        if (prev_node != NULL) *prev_node = curr;
         curr = curr->next;
     }
+    *fset_exists = false;
+}
 
-    *result = false;
-    return NULL;
+static void __get_node(funct_hand_t *self, funct_hand_node_t **node, char *name) {
+    // Get previous node
+    funct_hand_node_t *prev;
+    bool funct_exists;
+    __get_prev_node(self, &funct_exists, &prev, name);
+    // Get current node
+    __get_next_node(self, prev, node, funct_exists);
+}
+
+static void __get_next_node(funct_hand_t *self, funct_hand_node_t *prev, funct_hand_node_t **next,
+        bool fset_exists) {
+    // Set next node to null
+    if (!fset_exists) {
+        *next = NULL;
+        return;
+    }
+    // Function exists
+    if (prev == NULL) {
+        *next = self->first;
+    } else {
+        *next = prev->next;
+    }
 }

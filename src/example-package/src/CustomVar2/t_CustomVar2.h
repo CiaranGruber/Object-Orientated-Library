@@ -17,7 +17,8 @@ The structures used to manage the <Custom Var> class and instances
 #include "../../dependencies/pkg_dev_lang.h"
 #include "../CustomVar/t_CustomVar.h"
 
-#define CUSTOM_VAR_CLS_NAME "CustomVar" // The class name that is used to represent a <Custom Var 2>
+/* The class name that is used to represent a <Custom Var 2> */
+#define CUSTOM_VAR_CLS_NAME "CustomVar"
 
 /* A type of variable used to represent a <Custom Var 2> instance */
 typedef inst_custom_var_t inst_custom_var_2_t;

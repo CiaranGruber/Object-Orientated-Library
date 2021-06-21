@@ -15,7 +15,8 @@ The structures used to manage the Object class and instances
 #ifndef TYPE_OBJECT
 #define TYPE_OBJECT
 
-#define OBJECT_CLS_NAME "Object" // The class name that is used to represent an Object
+/* The class name that is used to represent an Object */
+#define OBJECT_CLS_NAME "Object"
 
 #include "../../typedefs.h"
 

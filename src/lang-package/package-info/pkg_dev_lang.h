@@ -35,6 +35,20 @@ inst_error_t *new_class(prog_hand_t *prog_handler, char *class_name, char *paren
         bool managed_data, size_t size);
 
 /*
+Checks whether a class exists and if it does, stores it in the 'dest' variable if it is specified
+
+*prog_handler: The program handler that contains the class and error handlers
+*result: A pointer to the integer where the result is meant to be stored
+**dest: The location to store the retrieved class pointer to
+*class_name: The name of the class to retrieve from the Class Handler
+
+Errors:
+    ErrInvalidParameters: Thrown if 'result' or 'class_name' is set to NULL
+*/
+inst_error_t *class_exists(prog_hand_t *prog_handler, bool *result, class_t **dest,
+        char *class_name);
+
+/*
 Initialises the handlers used within a class
 
 *prog_handler: The program handler that contains the class and error handlers

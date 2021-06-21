@@ -14,7 +14,8 @@ The structures used to manage the Error class and instances
 #ifndef TYPE_ERROR
 #define TYPE_ERROR
 
-#define ERROR_CLS_NAME "Error" // The class name that is used to represent an Error
+/* The class name that is used to represent an Error */
+#define ERROR_CLS_NAME "Error"
 
 #include "../../typedefs.h"
 

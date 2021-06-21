@@ -15,6 +15,9 @@ The structures used to manage the ErrFunctionNotDefined class and instances
 #ifndef TYPE_ERR_FUNCTION_NOT_DEFINED
 #define TYPE_ERR_FUNCTION_NOT_DEFINED
 
+/* The class name that is used torepresent an ErrFunctionNotDefined */
+#define ERR_FUNCTION_NOT_DEFINED_CLS_NAME "ErrFunctionNotDefined"
+
 #include "../../../../typedefs.h"
 
 /*

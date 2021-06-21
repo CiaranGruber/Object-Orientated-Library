@@ -127,9 +127,13 @@ Additionally, Static and Non-Static functions are distinct from each other, allo
 <u>Commands</u>
 
 * `run_function` - Used to run a Non-Static Function for an instance
+* `run_super_function` - Used to run a Non-Static Function for an instance using the definition from a parent class
 * `run_s_function` - Used to run a Static Function
+* `run_super_s_function` - Used to run a Static Function for an instance using the definition from a parent class
 * `get_return_type` - Used to get the return type of a function
+* `get_super_return_type` - Used to get the return type of a function as defined by a parent class
 * `get_s_return_type` - Used to get the return type of a static function
+* `get_super_s_return_type` - Used to get the return type of a static function as defined by a parent class
 
 ## Classes
 
@@ -214,10 +218,14 @@ When creating types, only two main files are required, being the header file con
 
 ### Classes
 
-Classes are the main containers used to hold all the features when creating a type. The class files are used to hold all information about a type as well as the functions used to create and initialise the type. The structure used in the example package should be followed when creating classes. In addition to the End User commands, there are a set of developer commands, primarily used to add classes to the program handler
+Classes are the main containers used to hold all the features when creating a type. The class files are used to hold all information about a type as well as the functions used to create and initialise the type. The structure used in the example package should be followed when creating classes. In addition to the End User commands, there are a set of developer commands, primarily used to add classes to the program handler. When creating classes/adding them to the class handler, a check should first be done to see if the class already exists, and if so, to not recreate it.
+
+_Note: Classes that use Unmanaged data should override the 'reset_data' non-static function provided by the Object class by default. Other classes will automatically use the Object implementation unless overridden_
+
 <u>Commands</u>
 
 * `new_class` - Used to create a new class with the specified details and add it to the program handler automatically
+* `class_exists` - Used to test if the class already exists within the class handler
 * `init_class` - Initialises the member fields handler, class variable handler, function and static function handler
 
 ### Functions

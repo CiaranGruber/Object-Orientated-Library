@@ -15,16 +15,9 @@ inst_error_t *import_lang_package(prog_hand_t *prog_handler) {
 
     add_err(prog_handler, "ErrClassAlreadyExists");
 
-    // Add Custom Var
-    error = new_custom_var_cls(prog_handler);
-    if (err_is_equal(error, "ErrClassAlreadyExists")) 
-        add_err(prog_handler, "ErrClassAlreadyExists");
-    else if (error != NULL) return error;
-    // Add Custom Var 2
-    error = new_custom_var_2_cls(prog_handler);
-    if (err_is_equal(error, "ErrClassAlreadyExists")) 
-        add_err(prog_handler, "ErrClassAlreadyExists");
-    else if (error != NULL) return error;
+    // Add Classes
+    bool cls_already_exists;
+    class_exists(prog_handler, &cls_already_exists, NULL, CUSTOM_VAR_CLS_NAME);
 
     // Initialise Classes
     error = init_custom_var_cls(prog_handler);

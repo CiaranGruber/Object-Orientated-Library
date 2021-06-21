@@ -26,10 +26,23 @@ prog_hand_t *new_lang_package() {
 
 inst_error_t *import_lang_package(prog_hand_t *prog_handler) {
     inst_error_t *error;
+    
+    bool cls_already_exists;
 
-    // Add Classes (No error checking due to initial language)
-    new_object_cls(prog_handler);
-    new_integer_cls(prog_handler);
-    new_error_cls(prog_handler);
-    new_err_function_not_defined_cls(prog_handler);
+    // Add Classes
+    class_exists(prog_handler, &cls_already_exists, NULL, OBJECT_CLS_NAME);
+    if (!cls_already_exists) new_object_cls(prog_handler);
+
+    class_exists(prog_handler, &cls_already_exists, NULL, INTEGER_CLS_NAME);
+    if (!cls_already_exists) new_integer_cls(prog_handler);
+
+    class_exists(prog_handler, &cls_already_exists, NULL, INTEGER_CLS_NAME);
+    cls_already_exists = false;
+    if (!cls_already_exists) new_integer_cls(prog_handler);
+
+    class_exists(prog_handler, &cls_already_exists, NULL, ERROR_CLS_NAME);
+    if (!cls_already_exists) new_error_cls(prog_handler);
+
+    class_exists(prog_handler, &cls_already_exists, NULL, ERR_FUNCTION_NOT_DEFINED_CLS_NAME);
+    if (!cls_already_exists) new_err_function_not_defined_cls(prog_handler);
 }

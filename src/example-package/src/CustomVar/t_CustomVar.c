@@ -14,10 +14,15 @@ The code used to provide for the implementation of a <Custom Var> type
 #include <stdlib.h>
 #include "t_CustomVar.h"
 
+typedef struct {
+    int value1;
+    int value2;
+} var_data_t;
+
 inst_error_t *new_custom_var_cls(prog_hand_t *prog_handler) {
     inst_error_t *error;
 
-    error = new_class(prog_handler, CUSTOM_VAR_CLS_NAME, NULL, true, 0);
+    error = new_class(prog_handler, CUSTOM_VAR_CLS_NAME, NULL, false, sizeof(var_data_t));
     return error;
 }
 
@@ -49,5 +54,7 @@ inst_error_t *init_custom_var_cls(prog_hand_t *prog_handler) {
 
 }
 
-static inst_error_t *static_func(prog_hand_t *prog_handler, inst_integer_t *self,
-        var_t *void_return, var_t **void_params)
+static inst_error_t *static_func(prog_hand_t *prog_handler, inst_custom_var_t *return_var,
+        var_t **void_params) {
+    new_var(prog_handler, return_var);
+}

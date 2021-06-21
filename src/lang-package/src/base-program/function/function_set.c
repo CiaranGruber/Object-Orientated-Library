@@ -15,6 +15,12 @@ The code used to provide for the implementation of a Function Set
 #include "function.h"
 #include "../../program-handlers/error-handler/error_handler.h"
 
+static void __get_prev_node(prog_hand_t *prog_handler, function_set_t *self, bool *funct_exists,
+        funct_node_t **prev_node, class_t **param_types, int param_count);
+
+static void __get_node(prog_hand_t *prog_handler, function_set_t *self, funct_node_t **node,
+        class_t **param_types, int param_count);
+
 void free_funct_set(function_set_t *src) {
     if (src == NULL) return;
 
@@ -47,7 +53,7 @@ inst_error_t *new_funct_set(prog_hand_t *prog_handler, function_set_t *dest, cha
     return NULL;
 }
 
-inst_error_t *funct_set_add(prog_hand_t *prog_handler, function_set_t *self, function_t *function) {
+inst_error_t *fset_add_function(prog_hand_t *prog_handler, function_set_t *self, function_t *function) {
     inst_error_t *error;
     if (self == NULL || function == NULL) {
         return new_error(prog_handler, "ErrInvalidParameters");
@@ -61,41 +67,37 @@ inst_error_t *funct_set_add(prog_hand_t *prog_handler, function_set_t *self, fun
     // Attempt to find existing function that match the parameters
     funct_node_t *prev;
     bool is_found;
-    error = f_set_function_exists(prog_handler, &is_found, self, &prev, function->param_types, 
-                                function->param_count);
+    error = fset_function_exists(prog_handler, self, &is_found, function->param_types,
+                                    function->param_count);
     if (error != NULL) return error;
     if (is_found) {
         return new_error(prog_handler, "ErrFunctionAlreadyExists");
     }
 
-    // Add function
+    // Add function to start
     funct_node_t *function_node = (funct_node_t *)malloc(sizeof(funct_node_t));
     function_node->function = function;
-    function_node->next = NULL;
-    if (self->first == NULL) {
-        self->first = function_node;
-    }
-    prev->next = function_node;
+    function_node->next = self->first;
+    self->first = function_node;
 
     return NULL;
 }
 
-inst_error_t *funct_set_remove(prog_hand_t *prog_handler, function_set_t *self, 
+inst_error_t *fset_remove(prog_hand_t *prog_handler, function_set_t *self, 
         class_t **param_types, int param_count) {
     inst_error_t *error;
     if (self == NULL) {
         return new_error(prog_handler, "ErrInvalidParameters");
     }
 
-    // Find the function
+    // Attempt to get the function
     funct_node_t *prev, *curr;
-    bool is_found;
-    error = f_set_function_exists(prog_handler, &is_found, self, &prev, param_types, 
-                                param_count);
-    if (error != NULL) return error;
-    if (!is_found) {
+    bool funct_exists;
+    __get_prev_node(prog_handler, self, &funct_exists, &prev, param_types, param_count);
+    if (!funct_exists) {
         return new_error(prog_handler, "ErrFunctionNotDefined");
     }
+    // Set current node
     if (prev == NULL) {
         curr = self->first;
     } else {
@@ -116,91 +118,64 @@ inst_error_t *funct_set_remove(prog_hand_t *prog_handler, function_set_t *self,
     return NULL;
 }
 
-inst_error_t *function_set_run(prog_hand_t *prog_handler, function_set_t *self, var_t *inst_var,
-        var_t *return_var, var_t **params, int param_count) {
+inst_error_t *fset_get_function(prog_hand_t *prog_handler, function_set_t *self, function_t **dest,
+        class_t **param_types, int param_count) {
     inst_error_t *error;
-    if (self == NULL) {
+    if (self == NULL || dest == NULL) {
         return new_error(prog_handler, "ErrInvalidParameters");
     }
 
-    // Convert parameters to parameter types
+    // Attempt to get function node
     funct_node_t *node;
-    class_t **param_types;
-    if (params == NULL) {
-        param_types = (class_t **)malloc(param_count*sizeof(class_t *));
-        for (int i = 0; i < param_count; i++) {
-            param_types[i] = params[i]->desc->type;
-        }
-    } else {
-        param_types = NULL;
-    }
-    // Find function
-    bool is_found;
-    error = f_set_function_exists(prog_handler, &is_found, self, &node, param_types, 
-                                param_count);
-    if (error != NULL) return error;
-
-    if (!is_found) {
+    __get_node(prog_handler, self, &node, param_types, param_count);
+    if (node == NULL) {
         return new_error(prog_handler, "ErrFunctionNotDefined");
     }
-    if (node == NULL) {
-        node = self->first;
-    } else {
-        node = node->next;
-    }
 
-    // Run the function
-    error = function_run(prog_handler, node->function, inst_var, return_var, params, param_count);
-    return error;
-}
-
-inst_error_t *funct_set_get_return(prog_hand_t *prog_handler, function_set_t *self, 
-        class_t **return_type, class_t **param_types, int param_count) {
-    inst_error_t *error;
-    if (self == NULL || return_type == NULL) {
-        return new_error(prog_handler, "ErrInvalidParameters");
-    }
-
-    // Attempt to find function
-    funct_node_t *node;
-    bool is_found;
-    error = f_set_function_exists(prog_handler, &is_found, self, &node, param_types, 
-                                param_count);
-    if (error != NULL) return error;
-
-    if (!is_found) {
-        return new_error(prog_handler, "ErrFunctionNotDefined");
-    }
-    if (node == NULL) {
-        node = self->first;
-    } else {
-        node = node->next;
-    }
-
-    // Set the return type
-    *return_type = node->function->return_type;
+    // Set Function
+    *dest = node->function;
     return NULL;
 }
 
-inst_error_t *f_set_function_exists(prog_hand_t *prog_handler, bool *result, function_set_t *self, 
-        funct_node_t **prev_node, class_t **param_types, int param_count) {
+inst_error_t *fset_function_exists(prog_hand_t *prog_handler, function_set_t *self, bool *result,
+        class_t **param_types, int param_count) {
     inst_error_t *error;
     if (result == NULL || self == NULL) {
         return new_error(prog_handler, "ErrInvalidParameters");
     }
 
+    __get_prev_node(prog_handler, self, result, NULL, param_types, param_count);
+    return NULL;
+}
+
+static void __get_prev_node(prog_hand_t *prog_handler, function_set_t *self, bool *funct_exists,
+        funct_node_t **prev_node, class_t **param_types, int param_count) {
     funct_node_t *curr = self->first;
     *prev_node = NULL;
+    // Loop through available functions
     while(curr != NULL) {
-        function_t *func = curr->function;
-        is_function_equal(prog_handler, result, func, param_types, param_count);
-        if (*result) {
-            return NULL;
+        // Check if the function in the node is equal - If it exists leave prev_node as is
+        is_function_equal(prog_handler, funct_exists, curr->function, param_types, param_count);
+        if (*funct_exists) {
+            return;
         }
 
+        // Iterate through nodes
         if (prev_node != NULL) *prev_node = curr;
         curr = curr->next;
     }
-    *result = false;
-    return NULL;
+    // Relevant if there are no functions in the function set
+    *funct_exists = false;
+}
+
+static void __get_node(prog_hand_t *prog_handler, function_set_t *self, funct_node_t **node,
+        class_t **param_types, int param_count) {
+    bool function_exists;
+    funct_node_t *prev_node;
+    __get_prev_node(prog_handler, self, &function_exists, &prev_node, param_types, param_count);
+    if (function_exists) {
+        *node = prev_node != NULL ? prev_node->next : self->first;
+    } else {
+        *node = NULL;
+    }
 }

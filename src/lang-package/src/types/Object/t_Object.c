@@ -174,7 +174,7 @@ inst_error_t *init_object_inst(prog_hand_t *prog_handler, inst_object_t *object,
 
     // Free data if it is already initialised
     if (object->initialised) {
-        if (class->uses_inst_var_handler) {
+        if (class->has_managed_data) {
             free_var_hand(object->data);
         } else {
             free(object->data);
@@ -182,7 +182,7 @@ inst_error_t *init_object_inst(prog_hand_t *prog_handler, inst_object_t *object,
     }
 
     // Do not initialise data if the class does not use the variable handler in its instances
-    if (class->uses_inst_var_handler == false) {
+    if (class->has_managed_data == false) {
         return NULL;
     }
 
@@ -270,4 +270,16 @@ Integer - An integer representing the length of the string
 static inst_error_t *str_len(prog_hand_t *prog_handler, inst_object_t *self,
         inst_integer_t *return_var, var_t **void_params) {
     inst_error_t *error;
+}
+
+/*
+Resets the data associated with a variable by freeing any existing data. This function is typically
+overridden by Unmanaged variables
+
+
+
+*/
+static inst_error_t *reset_data(prog_hand_t *prog_handler, inst_object_t *self, var_t *void_return,
+        var_t **void_params) {
+    
 }

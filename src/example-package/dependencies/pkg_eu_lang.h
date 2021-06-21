@@ -20,9 +20,14 @@ typedef struct gen_class class_t;
 /* A structure that holds the various features contained in a Variable */
 typedef struct gen_var var_t;
 
-#define INTEGER_CLS_NAME "Integer" // The class name that is used to represent an Integer
-#define OBJECT_CLS_NAME "Object" // The class name that is used to represent an Object
-#define ERROR_CLS_NAME "Error" // The class name that is used to represent an Error
+/* The class name that is used to represent an Integer */
+#define INTEGER_CLS_NAME "Integer"
+/* The class name that is used to represent an Object */
+#define OBJECT_CLS_NAME "Object"
+/* The class name that is used to represent an Error */
+#define ERROR_CLS_NAME "Error"
+/* The class name that is used torepresent an ErrFunctionNotDefined */
+#define ERR_FUNCTION_NOT_DEFINED_CLS_NAME "ErrFunctionNotDefined"
 
 /* A type of variable used to represent an Error instance */
 typedef var_t inst_error_t;

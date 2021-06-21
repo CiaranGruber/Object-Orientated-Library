@@ -74,9 +74,36 @@ Returns: Returns a variable that is dependent on the function
 
 Errors: Throws any errors related to the function that is run
     ErrInvalidParameters: Thrown if 'self' or 'funct_name' is set to NULL
+    ErrFunctionNotDefined: Thrown if a function using the given parameters does not exist
+    ErrClassNotDefined: Thrown if the function is not present and the Object class doesn't exist
 */
 inst_error_t *run_function(prog_hand_t *prog_handler, var_t *self, char *funct_name, 
         var_t *return_var, var_t **params, int param_count);
+
+/*
+Runs a function that is a part of a variable based upon the function name and parameters and which
+class to initiate the function from
+
+*prog_handler: The program handler that contains the class and error handlers
+*self: The variable to run the function for
+*funct_name: The name of the function to run
+*return_var: The variable to store the return value after running the function
+**params: The list of parameters with which to run the function
+param_count: The number of parameters in the params list
+super_amount: The number of parent levels to bypass
+
+Returns: Returns a variable that is dependent on the function
+
+Errors: Throws any errors related to the function that is run
+    ErrInvalidParameters: Thrown if 'self' or 'funct_name' is set to NULL
+    ErrFunctionNotDefined: Thrown if a function using the given parameters does not exist
+    ErrClassNotDefined: Thrown if the function is not present and the Object class doesn't exist
+    ErrOutOfMemory: Thrown if there is not enough memory to construct a class list for the
+                    parameters
+    ErrInvalidDataFormat: Thrown if one of the parent classes bypassed uses umanaged data
+*/
+inst_error_t *run_super_function(prog_hand_t *prog_handler, var_t *self, char *funct_name,
+        var_t *return_var, var_t **params, int param_count, int super_amount);
 
 /*
 Gets a member field from a variable that inherits from Object classes which use a Variable Handler

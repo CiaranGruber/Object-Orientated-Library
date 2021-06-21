@@ -145,7 +145,7 @@ struct gen_class {
     as a parameter in functions as the variable may not have the members fields called for in a
     function
     */
-    bool uses_inst_var_handler;
+    bool has_managed_data;
     size_t size;                    // An integer representing the size of the variable
     class_t *parent;                // The parent Class which this class inherits from
     s_funct_hand_t *static_methods; // The function handler for the class

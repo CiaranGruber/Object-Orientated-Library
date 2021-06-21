@@ -4,16 +4,15 @@ By Ciaran Gruber
 
 Used to test the generic variable data
 
-Todo: Restructure code format to present main section as a standalone package
-Todo: Add package handler in program handler in order to identify packages that are imported
-        - Create new error class for when packages are invalid
-Todo: Add functions to get class variables
-Todo: Allow for functions to be run with the "super" identifier used to get the parent function
 Todo: When freeing member fields, also free their data correctly if they use a variable handler
-Todo: Format return variables before running function
 
-When discussing, should I add a locked value to classes that occurs after a package is imported as
-it would protect from viruses, etc, or is this not needed?
+Questions:
+- Should there be a central typedefs document for each package?
+- Would it be good to have a package handler, used to handle packages using a new package struct
+- Should classes be "locked" after being imported from packages to prevent externally changing
+    functions, etc
+- Would it be better for functions to return two values in a structure, the error and a specified
+    return value?
 */
 
 #include <stdio.h>

@@ -107,13 +107,22 @@ inst_error_t *remove_err(prog_hand_t *prog_handler, char *error_name) {
 
 bool err_is_equal(inst_error_t *actual, char *expected) {
     // Handle NULL cases
-    if (expected == NULL) {
-        return actual == NULL;
-    } else if (actual == NULL) {
+    if (actual == NULL) {
+        return expected == NULL;
+    } else if (expected == NULL) {
         return false;
     }
     // Return comparison result
     return strcmp(actual->desc->type->class_name, expected) ? false : true;
+}
+
+inst_error_t *new_error(prog_hand_t *prog_handler, char *error_type) {
+    inst_error_t *error = (inst_error_t *)malloc(sizeof(inst_error_t));
+    new_var(prog_handler, error);
+    set_var_desc(prog_handler, error, error_type, "error_var");
+    init_var(prog_handler, error, NULL, 0);
+    handle_err(prog_handler, error);
+    return error;
 }
 
 static void __remove_err_ref(prog_hand_t *prog_handler, err_hand_node_t *prev_node) {
@@ -139,13 +148,4 @@ static err_hand_node_t *__find_err_position(err_hand_t *self, cls_error_t *error
         curr = curr->next;
     }
     return prev;
-}
-
-inst_error_t *new_error(prog_hand_t *prog_handler, char *error_type) {
-    inst_error_t *error = (inst_error_t *)malloc(sizeof(inst_error_t));
-    new_var(prog_handler, error);
-    set_var_desc(prog_handler, error, error_type, "error_var");
-    init_var(prog_handler, error, NULL, 0);
-    handle_err(prog_handler, error);
-    return error;
 }

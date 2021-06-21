@@ -8,6 +8,12 @@
             "command": "C:\\Alternate-Programs\\MinGW\\bin\\gcc.exe",
             "args": [
                 "-g",
+                /*/
+                "${workspaceFolder}\\src\\example-package\\package-info\\import_example.c",
+                "${workspaceFolder}\\src\\example-package\\src\\CustomVar\\t_CustomVar.c",
+                "${workspaceFolder}\\src\\example-package\\src\\CustomVar2\\t_CustomVar2.c",
+                //*/
+                //*/
                 "${workspaceFolder}\\src\\test.c",
                 "${workspaceFolder}\\src\\lang-package\\package-info\\import_lang.c",
                 "${workspaceFolder}\\src\\lang-package\\src\\base-program\\class\\class.c",
@@ -30,6 +36,7 @@
                 "${workspaceFolder}\\src\\lang-package\\src\\types\\Object\\t_Object.c",
                 "${workspaceFolder}\\src\\lang-package\\src\\types\\String\\t_String.c",
                 "${workspaceFolder}\\src\\lang-package\\src\\types\\type_creator.c",
+                //*/
                 "-o",
                 "${workspaceFolder}\\bin\\test.exe"
             ],

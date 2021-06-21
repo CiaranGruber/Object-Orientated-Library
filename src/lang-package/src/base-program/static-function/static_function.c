@@ -63,7 +63,7 @@ inst_error_t *s_function_run(prog_hand_t *prog_handler, s_function_t *self, var_
     for (int i = 0; i < param_count; i++) {
         class_t *curr_class = params[i]->desc->type;
         // Loop through to see if the variable is a child of a suitable class
-        while (curr_class != NULL || !curr_class->uses_inst_var_handler) {
+        while (curr_class != NULL || !curr_class->has_managed_data) {
             if (curr_class == self->param_types[i]) {
                 break;
             }
@@ -97,7 +97,7 @@ inst_error_t *is_s_function_equal(prog_hand_t *prog_handler, bool *result, s_fun
     for (int i = 0; i < param_count; i++) {
         curr_class = param_types[i];
         // Loop through to see if the variable is a child of a suitable class
-        while (curr_class != NULL || !curr_class->uses_inst_var_handler) {
+        while (curr_class != NULL || !curr_class->has_managed_data) {
             if (curr_class == param_types[i]) {
                 break;
             }

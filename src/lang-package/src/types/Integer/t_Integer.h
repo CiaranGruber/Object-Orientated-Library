@@ -15,7 +15,8 @@ The structures used to manage the Integer class and instances
 #ifndef TYPE_INTEGER
 #define TYPE_INTEGER
 
-#define INTEGER_CLS_NAME "Integer" // The class name that is used to represent an Integer
+/* The class name that is used to represent an Integer */
+#define INTEGER_CLS_NAME "Integer"
 
 #include "../../typedefs.h"
 
